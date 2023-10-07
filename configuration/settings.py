@@ -42,6 +42,7 @@ DJANGO_APPS = [
 
 INTERNAL_APPS = [
     'apps.authentication',
+    'apps.experiments',
     'apps.common',
 ]
 
@@ -214,8 +215,8 @@ JAZZMIN_SETTINGS = {
 
 # Internationalization
 
-LANGUAGE_CODE = 'ru'
-TIME_ZONE = 'Asia/Almaty'
+LANGUAGE_CODE = 'en'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 LOCALE_PATHS = [
