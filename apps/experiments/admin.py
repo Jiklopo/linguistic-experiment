@@ -9,7 +9,7 @@ class SingleChoiceQuestionAdmin(admin.ModelAdmin):
     list_display = ('order', 'notes', 'created_at')
 
 
-class AnswerInline(admin.StackedInline):
+class AnswerInline(admin.TabularInline):
     model = SingleChoiceAnswer
     can_delete = False
 

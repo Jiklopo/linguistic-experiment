@@ -48,6 +48,7 @@ INTERNAL_APPS = [
 
 THIRD_PARTY_APPS = [
     'django_extensions',
+    'rest_framework',
 ]
 
 INSTALLED_APPS = [
@@ -211,6 +212,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 JAZZMIN_SETTINGS = {
     "changeform_format": "single",
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+    ]
 }
 
 # Internationalization

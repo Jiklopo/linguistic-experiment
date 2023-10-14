@@ -17,6 +17,30 @@
         const jsPsych = initJsPsych({
             on_finish: function () {
                 jsPsych.data.displayData();
+                const request_data = {
+                    raw_json: jsPsych.data.allData.trials,
+                    answers: jsPsych.data.allData.trials.filter(function (element) {
+                        return 'question_id' in element;
+                    })
+                };
+                fetch('{% url 'single-choice-result' %}',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                            // You might need to include additional headers depending on your server requirements
+                        },
+                        body: JSON.stringify(request_data)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                            console.log('Success:', data);
+                        }
+                    )
+                    .catch(error => {
+                            console.error('Error:', error);
+                        }
+                    );
             }
         });
         const timeline = [];
@@ -31,8 +55,8 @@
         let preload_block;
         {% for question in questions %}
             question_block = {
-                    timeline: [
-                        {
+                timeline: [
+                    {
                         type: jsPsychHtmlButtonResponse,
                         stimulus: "Press the button when you are ready to listen for two samples.",
                         choices: ['Ready']

@@ -17,6 +17,9 @@ class SingleChoiceQuestion(UUIDModel, DateTimeModel):
 
     notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
 
+    def __str__(self):
+        return f'Question #{self.order}'
+
     class Meta:
         verbose_name = 'Single choice question'
         verbose_name_plural = 'Single choice questions'
@@ -25,6 +28,11 @@ class SingleChoiceQuestion(UUIDModel, DateTimeModel):
 
 class SingleChoiceResult(UUIDModel, DateTimeModel):
     notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
+    raw_json = models.JSONField(verbose_name='Raw JSON')
+
+    def __str__(self):
+        date_str = self.created_at.strftime('%d-%m-%Y %H:%M')
+        return f'Result from {date_str}'
 
     class Meta:
         verbose_name = 'result'
@@ -43,6 +51,9 @@ class SingleChoiceAnswer(UUIDModel):
     )
     selected_sample = models.IntegerField('Selected sample', choices=CorrectSampleChoices.choices)
     is_correct = models.BooleanField('Is correct')
+
+    def __str__(self):
+        return f'Answer #{self.question.order}'
 
     class Meta:
         verbose_name = 'Answer'
