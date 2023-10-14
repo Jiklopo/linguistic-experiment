@@ -23,6 +23,33 @@ class SingleChoiceQuestion(UUIDModel, DateTimeModel):
         ordering = ('order',)
 
 
+class SingleChoiceResult(UUIDModel, DateTimeModel):
+    notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
+
+    class Meta:
+        verbose_name = 'result'
+        verbose_name_plural = 'results'
+        ordering = ('-created_at',)
+
+
+class SingleChoiceAnswer(UUIDModel):
+    result = models.ForeignKey(
+        SingleChoiceResult, on_delete=models.CASCADE,
+        related_name='answers', verbose_name='Result'
+    )
+    question = models.ForeignKey(
+        SingleChoiceQuestion, on_delete=models.CASCADE,
+        related_name='answers', verbose_name='Question'
+    )
+    selected_sample = models.IntegerField('Selected sample', choices=CorrectSampleChoices.choices)
+    is_correct = models.BooleanField('Is correct')
+
+    class Meta:
+        verbose_name = 'Answer'
+        verbose_name_plural = 'Answers'
+        ordering = ('-result__created_at', 'question__order')
+
+
 class MultipleChoiceQuestion(UUIDModel, DateTimeModel):
     order = models.PositiveIntegerField('Order')
     first_sample = models.FileField('First sample', upload_to='multiple_choice/first_samples')
