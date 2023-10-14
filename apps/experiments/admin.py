@@ -5,7 +5,7 @@ from apps.experiments.models import SingleChoiceQuestion, MultipleChoiceQuestion
 
 @admin.register(SingleChoiceQuestion)
 class SingleChoiceQuestionAdmin(admin.ModelAdmin):
-    list_display = ('order', 'created_at')
+    list_display = ('order', 'notes', 'created_at')
 
 
 class StimulusInline(admin.StackedInline):

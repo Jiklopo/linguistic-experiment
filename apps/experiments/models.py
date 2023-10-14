@@ -1,6 +1,7 @@
 from django.db import models
 
 from apps.common.abstract_models import UUIDModel, DateTimeModel
+from apps.experiments.choices import CorrectSampleChoices
 
 
 class SingleChoiceQuestion(UUIDModel, DateTimeModel):
@@ -8,6 +9,13 @@ class SingleChoiceQuestion(UUIDModel, DateTimeModel):
     first_sample = models.FileField('First sample', upload_to='single_choice/first_samples')
     second_sample = models.FileField('Second sample', upload_to='single_choice/seconds_samples')
     stimulus = models.FileField('Stimulus', upload_to='single_choice/stimuli')
+    correct_sample = models.IntegerField(
+        'Correct sample',
+        choices=CorrectSampleChoices.choices,
+        default=CorrectSampleChoices.FIRST
+    )
+
+    notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
 
     class Meta:
         verbose_name = 'Single choice question'
