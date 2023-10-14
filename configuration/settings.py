@@ -87,23 +87,12 @@ TEMPLATES = [
 
 # Databases
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-PSQL_SETTINGS = {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': os.getenv('DB_NAME', 'lab_catalogue'),
-    'USER': os.getenv('DB_USER', 'postgres'),
-    'PASSWORD': os.getenv('DB_PASS', 'postgres'),
-    'HOST': os.getenv('DB_HOST', 'localhost'),
-    'PORT': os.getenv('DB_PORT', '5432'),
-    'ATOMIC_REQUESTS': True,
-}
-
-SQLITE_SETTINGS = {
-    'ENGINE': 'django.db.backends.sqlite3',
-    'NAME': BASE_DIR / 'db.sqlite3',
-}
 
 DATABASES = {
-    'default': PSQL_SETTINGS
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 # Caching
@@ -233,9 +222,34 @@ LOCALE_PATHS = [
 # Static files (CSS, JavaScript, Images)
 
 STATIC_URL = 'static-back/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'static/'
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static_files'
 ]
+
+if SECURITY_LEVEL > 0:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'location': 'media'
+            },
+        },
+        'staticfiles': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'location': 'static'
+            },
+        },
+    }
+
+# AWS
+AWS_S3_ACCESS_KEY_ID = os.getenv('AWS_S3_ACCESS_KEY_ID')
+AWS_S3_SECRET_ACCESS_KEY = os.getenv('AWS_S3_SECRET_ACCESS_KEY')
+AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
+
+AWS_STORAGE_BUCKET_NAME = 'sound_analysis'
+AWS_S3_REGION_NAME = 'sgp1'
+AWS_DEFAULT_ACL = 'public-read'
