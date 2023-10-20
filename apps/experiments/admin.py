@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from apps.experiments.models import SingleChoiceQuestion, MultipleChoiceQuestion, Stimulus, SingleChoiceAnswer, \
-    SingleChoiceResult
+from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, Stimulus
+from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult, SingleChoiceAnswer
 
 
 @admin.register(SingleChoiceQuestion)
 class SingleChoiceQuestionAdmin(admin.ModelAdmin):
-    list_display = ('order', 'notes', 'created_at')
+    list_display = ('order', 'correct_sample', 'notes', 'created_at')
 
 
 class AnswerInline(admin.TabularInline):

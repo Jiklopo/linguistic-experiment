@@ -2,7 +2,7 @@ from django.views import generic
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from apps.experiments.models import SingleChoiceQuestion, SingleChoiceResult
+from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult
 from apps.experiments.serializers import SingleChoiceResultSerializer
 
 

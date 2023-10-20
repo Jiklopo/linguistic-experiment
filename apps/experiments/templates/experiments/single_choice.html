@@ -14,42 +14,39 @@
 
 {% block scripts %}
     <script>
-        const jsPsych = initJsPsych({
-            on_finish: function () {
-                jsPsych.data.displayData();
-                const request_data = {
-                    raw_json: jsPsych.data.allData.trials,
-                    answers: jsPsych.data.allData.trials.filter(function (element) {
-                        return 'question_id' in element;
-                    })
-                };
-                fetch('{% url 'single-choice-result' %}',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                            // You might need to include additional headers depending on your server requirements
-                        },
-                        body: JSON.stringify(request_data)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                            console.log('Success:', data);
+        function send_data() {
+            const request_data = {answers: jsPsych.data.allData.trials}
+            fetch('{% url 'single-choice-result' %}',
+                {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(request_data)
+                })
+                .then(response => {
+                        console.log('Status Code:', response.status);
+                        if (!response.ok) {
+                            console.error(response)
+                            throw new Error(`Request failed with status ${response.status}`);
                         }
-                    )
-                    .catch(error => {
-                            console.error('Error:', error);
-                        }
-                    );
-            }
-        });
+                    }
+                )
+                .catch(error => {
+                        console.error('Error:', error);
+                    }
+                );
+
+        }
+
+        const jsPsych = initJsPsych();
         const timeline = [];
-        const welcome = {
-            type: jsPsychHtmlButtonResponse,
-            stimulus: "Welcome to the experiment. Press next key to begin.",
-            choices: ['Next']
-        };
-        timeline.push(welcome);
+
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus:
+                "Welcome to the experiment. " +
+                "In this experiment you will have to determine to which sample sound the stimulus is most similar to. " +
+                "Press any key to begin"
+        });
 
         let question_block;
         let preload_block;
@@ -57,9 +54,8 @@
             question_block = {
                 timeline: [
                     {
-                        type: jsPsychHtmlButtonResponse,
-                        stimulus: "Press the button when you are ready to listen for two samples.",
-                        choices: ['Ready']
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus: "You will listen for two sample sounds, press any key to continue",
                     },
                     {
                         type: jsPsychAudioKeyboardResponse,
@@ -77,18 +73,31 @@
                         }
                     },
                     {
-                        type: jsPsychAudioButtonResponse,
+                        type: jsPsychAudioKeyboardResponse,
                         response_allowed_while_playing: false,
                         stimulus: '{{ question.second_sample.url }}',
-                        prompt: 'Listen to the second sample. Press the button to listen to the stimulus.',
-                        choices: ['Ready'],
+                        prompt: 'Listen to the second sample.',
+                        trial_ends_after_audio: true
                     },
                     {
-                        type: jsPsychAudioButtonResponse,
-                        response_allowed_while_playing: false,
+                        type: jsPsychCallFunction,
+                        async: true,
+                        func: function (done) {
+                            jsPsych.pluginAPI.setTimeout(done, 500);
+                        }
+                    },
+                    {
+                        type: jsPsychHtmlKeyboardResponse,
+                        stimulus:
+                            'On the next slide you will have to listen to the stimulus and determine to which sample it is most similar to. ' +
+                            'Press F for the first sample and S for second sample. ' +
+                            'Press any key to listen to the stimulus.',
+                    },
+                    {
+                        type: jsPsychAudioKeyboardResponse,
                         stimulus: '{{ question.stimulus.url }}',
-                        choices: ['The first', 'The second'],
-                        prompt: 'Listen to the stimulus and choose which sample it is similar to (1 or 2).',
+                        choices: ['f', 's'],
+                        prompt: 'Listen to the stimulus and choose which sample it is similar to (press f or s).',
                         data: {
                             question_id: '{{ question.id }}',
                             correct_sample: '{{ question.correct_sample }}'
@@ -107,6 +116,20 @@
             timeline.push(preload_block)
             timeline.push(question_block)
         {% endfor %}
+
+        timeline.push(
+            {
+                type: jsPsychCallFunction,
+                async: true,
+                func: send_data
+            }
+        )
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus:
+                "Thank you for participation! Your results have been recorded."
+        });
+
         jsPsych.run(timeline);
     </script>
 

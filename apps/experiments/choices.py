@@ -1,6 +1,6 @@
-from django.db.models import IntegerChoices
+from django.db.models import TextChoices
 
 
-class CorrectSampleChoices(IntegerChoices):
-    FIRST = 0, 'First'
-    SECONDS = 1, 'Second'
+class CorrectSampleChoices(TextChoices):
+    FIRST = 'f', 'First'
+    SECOND = 's', 'Second'
