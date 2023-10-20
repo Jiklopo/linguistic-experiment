@@ -229,7 +229,8 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static_files'
 ]
 
-if SECURITY_LEVEL > 0:
+ENABLE_S3 = int(os.getenv('ENABLE_S3', '0'))
+if ENABLE_S3:
     STORAGES = {
         'default': {
             'BACKEND': 'storages.backends.s3.S3Storage',
