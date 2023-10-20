@@ -110,7 +110,11 @@
             };
             preload_block = {
                 type: jsPsychPreload,
-                trials: question_block
+                audio: [
+                    '{{ question.first_sample.url }}',
+                    '{{ question.second_sample.url }}',
+                    '{{ question.stimulus.url }}'
+                ]
             }
 
             timeline.push(preload_block)
