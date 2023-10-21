@@ -212,7 +212,7 @@ REST_FRAMEWORK = {
 # Internationalization
 
 LANGUAGE_CODE = 'en'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 USE_I18N = True
 USE_TZ = True
 LOCALE_PATHS = [
