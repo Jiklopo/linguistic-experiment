@@ -112,15 +112,15 @@
             timeline: [
                 {
                     type: jsPsychHtmlKeyboardResponse,
-                    stimulus: 'Welcome'
+                    stimulus: '<p>Welcome to the experiment! This experiment will consist of 2 tasks.<br>実験へようこそ！この実験は2つの課題から構成されています。<br>歡迎參加實驗！ 本實驗由兩項任務組成。<br><br>Please do not close this window or click the Back button on your browser at any point during the experiment.<br>実験中は、このウィンドウを閉じたり、ブラウザの「戻る」ボタンをクリックしないでください。<br>在實驗過程中，請不要關閉此視窗，或點擊瀏覽器上的「返回」按鈕。<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。<br></p>'
                 },
                 {
                     type: jsPsychHtmlKeyboardResponse,
-                    stimulus: 'Instructions'
+                    stimulus: '<p>Task 1<br>Three sounds will be played.<br>Is the third sound the same as (or similar to) the first sound or the second sound?<br>If the third sound is the same as (or similar to) the first sound, press “f” on your keyboard.<br>If the third sound is the same as (or similar to) the second sound, press “j” on your keyboard.<br><br>課題１<br>これから３つの音声が再生されます。<br>３番目の音声は、１番目の音声と２番目の音声のどちらと同じです（あるいは似ています）か？<br>１番目の音声と同じ（あるいは似ている）場合は、キーボードの「f」キーを押してください。<br>２番目の音声と同じ（あるいは似ている）場合は、キーボードの「j」キーを押してください。<br><br>任務一<br>接下來將會播放三個聲音。 <br>第三個聲音與第一個聲音相同（或相似），還是與第二個聲音相同（或相似）？ <br>若第三個聲音與第一個聲音相同（或相似），請按下鍵盤上的「f」鍵。 <br>若第三個聲音與第二個聲音相同（或相似），請按下鍵盤上的「j」鍵。<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。<br></p>'
                 },
                 {
                     type: jsPsychHtmlKeyboardResponse,
-                    stimulus: 'Practice'
+                    stimulus: '<p>Let’s practice a little!<br>ではちょっと練習してみましょう！<br>先練習一下!<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。<br></p>'
                 }
             ]
         });
@@ -137,7 +137,7 @@
 
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Actual"
+            stimulus: 'That was 4 practice trials.<br>Now onto the actual experiment.<br>There will be a break every 20 trials.<br><br>４回のトライアルお疲れ様でした。<br>これから本番に入ります。<br>20回ごとに休憩が入ります。<br><br>您剛才完成了四個試次。<br>現在進入實際實驗階段。<br>每進行二十個試次將休息一次。<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。<br></p>'
         });
 
         {% for questions_list in questions %}
@@ -152,7 +152,7 @@
             {% endfor %}
             timeline.push({
                 type: jsPsychHtmlKeyboardResponse,
-                stimulus: "Break time"
+                stimulus: '<p>Let’s take a break for a moment. Please press any key on your keyboard when you are ready to continue.<br>少し休憩しましょう。再開の準備ができたらキーボードで任意のキーを押してください。<br>現在休息一下。當您準備好繼續時，請按下鍵盤上的任意鍵。</p>'
             });
         {% endfor %}
 
@@ -165,7 +165,7 @@
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Thank you"
+            stimulus: '<p>This is the end of the first task. Please let me know so that I can send you the link to the second task. <br>課題１は以上です。お疲れ様でした。課題２へのURLをお送りいたしますので、お声掛けください。<br>任務一到此結束。請通知我，以便我把任務二的鏈接發給您。</p>'
         });
 
         jsPsych.run(timeline);
