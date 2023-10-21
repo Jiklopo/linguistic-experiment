@@ -13,6 +13,7 @@ class SingleChoiceQuestion(UUIDModel, DateTimeModel):
         'Correct sample', max_length=1,
         choices=CorrectSampleChoices.choices
     )
+    is_test_question = models.BooleanField('Is test question', default=False)
     notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
 
     def __str__(self):

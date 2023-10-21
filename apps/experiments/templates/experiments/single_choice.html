@@ -50,13 +50,10 @@
 
         let question_block;
         let preload_block;
-        {% for question in questions %}
+
+        {% for question in practice_questions %}
             question_block = {
                 timeline: [
-                    {
-                        type: jsPsychHtmlKeyboardResponse,
-                        stimulus: "You will listen for two sample sounds, press any key to continue",
-                    },
                     {
                         type: jsPsychAudioKeyboardResponse,
                         response_allowed_while_playing: false,
@@ -83,21 +80,20 @@
                         type: jsPsychCallFunction,
                         async: true,
                         func: function (done) {
-                            jsPsych.pluginAPI.setTimeout(done, 500);
+                            jsPsych.pluginAPI.setTimeout(done, 750);
                         }
                     },
                     {
-                        type: jsPsychHtmlKeyboardResponse,
-                        stimulus:
-                            'On the next slide you will have to listen to the stimulus and determine to which sample it is most similar to. ' +
-                            'Press F for the first sample and S for second sample. ' +
-                            'Press any key to listen to the stimulus.',
+                        type: jsPsychAudioKeyboardResponse,
+                        response_allowed_while_playing: false,
+                        stimulus: '{{ question.stimulus.url }}',
+                        prompt: 'Listen to the stimulus.',
+                        trial_ends_after_audio: true
                     },
                     {
-                        type: jsPsychAudioKeyboardResponse,
-                        stimulus: '{{ question.stimulus.url }}',
-                        choices: ['f', 's'],
-                        prompt: 'Listen to the stimulus and choose which sample it is similar to (press f or s).',
+                        type: jsPsychHtmlKeyboardResponse,
+                        choices: ['f', 'j'],
+                        stimulus: 'Choose which sample is most similar to the stimulus (press f or j)',
                         data: {
                             question_id: '{{ question.id }}',
                             correct_sample: '{{ question.correct_sample }}'
@@ -121,20 +117,95 @@
             timeline.push(question_block)
         {% endfor %}
 
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Press any key to begin the actual experiment"
+        });
+
+        {% for questions_list in questions %}
+            {% for question in questions_list %}
+                question_block = {
+                    timeline: [
+                        {
+                            type: jsPsychAudioKeyboardResponse,
+                            response_allowed_while_playing: false,
+                            stimulus: '{{ question.first_sample.url }}',
+                            choices: 'NO_KEYS',
+                            prompt: 'Listen to the first sample.',
+                            trial_ends_after_audio: true,
+                        },
+                        {
+                            type: jsPsychCallFunction,
+                            async: true,
+                            func: function (done) {
+                                jsPsych.pluginAPI.setTimeout(done, 750);
+                            }
+                        },
+                        {
+                            type: jsPsychAudioKeyboardResponse,
+                            response_allowed_while_playing: false,
+                            stimulus: '{{ question.second_sample.url }}',
+                            prompt: 'Listen to the second sample.',
+                            trial_ends_after_audio: true
+                        },
+                        {
+                            type: jsPsychCallFunction,
+                            async: true,
+                            func: function (done) {
+                                jsPsych.pluginAPI.setTimeout(done, 750);
+                            }
+                        },
+                        {
+                            type: jsPsychAudioKeyboardResponse,
+                            response_allowed_while_playing: false,
+                            stimulus: '{{ question.stimulus.url }}',
+                            prompt: 'Listen to the stimulus.',
+                            trial_ends_after_audio: true
+                        },
+                        {
+                            type: jsPsychHtmlKeyboardResponse,
+                            choices: ['f', 'j'],
+                            stimulus: 'Choose which sample is most similar to the stimulus (press f or j)',
+                            data: {
+                                question_id: '{{ question.id }}',
+                                correct_sample: '{{ question.correct_sample }}'
+                            },
+                            on_finish: function (data) {
+                                console.log(data);
+                            }
+                        }
+                    ]
+                };
+                preload_block = {
+                    type: jsPsychPreload,
+                    audio: [
+                        '{{ question.first_sample.url }}',
+                        '{{ question.second_sample.url }}',
+                        '{{ question.stimulus.url }}'
+                    ]
+                }
+
+                timeline.push(preload_block)
+                timeline.push(question_block)
+            {% endfor %}
+            timeline.push({
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: "Press any key to continue"
+            });
+        {% endfor %}
+
+
         timeline.push(
             {
                 type: jsPsychCallFunction,
-                async: true,
                 func: send_data
             }
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus:
-                "Thank you for participation! Your results have been recorded."
+            stimulus: "Thank you for participation! Your results have been recorded."
         });
 
         jsPsych.run(timeline);
     </script>
-
 {% endblock %}

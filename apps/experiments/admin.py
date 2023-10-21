@@ -6,7 +6,7 @@ from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleCh
 
 @admin.register(SingleChoiceQuestion)
 class SingleChoiceQuestionAdmin(admin.ModelAdmin):
-    list_display = ('order', 'correct_sample', 'notes', 'created_at')
+    list_display = ('order', 'correct_sample', 'is_test_question', 'notes', 'created_at')
 
 
 class AnswerInline(admin.TabularInline):
@@ -23,6 +23,7 @@ class AnswerInline(admin.TabularInline):
 @admin.register(SingleChoiceResult)
 class SingleChoiceResultAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'notes']
+    readonly_fields = ['created_at']
     inlines = [AnswerInline]
 
 
