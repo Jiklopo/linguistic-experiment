@@ -13,6 +13,6 @@ multiple_choice_patterns = [
 ]
 
 urlpatterns = [
-    path('single_choice/', include(single_choice_patterns)),
-    path('multiple_choice/', include(multiple_choice_patterns)),
+    path('task1/', include(single_choice_patterns)),
+    path('task2/', include(multiple_choice_patterns)),
 ]

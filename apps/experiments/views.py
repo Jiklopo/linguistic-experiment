@@ -17,7 +17,7 @@ class SingleChoiceExperimentView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_qs = SingleChoiceQuestion.objects.order_by('order')
+        base_qs = SingleChoiceQuestion.objects.order_by('display_order')
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         questions = base_qs.filter(is_test_question=False)
         context['questions'] = self.split_list(questions, 20)

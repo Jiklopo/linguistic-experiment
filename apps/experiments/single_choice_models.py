@@ -6,6 +6,7 @@ from apps.experiments.choices import CorrectSampleChoices
 
 class SingleChoiceQuestion(UUIDModel, DateTimeModel):
     order = models.PositiveIntegerField('Order')
+    display_order = models.PositiveIntegerField('Display order', default=0)
     first_sample = models.FileField('First sample', upload_to='single_choice/first_samples')
     second_sample = models.FileField('Second sample', upload_to='single_choice/seconds_samples')
     stimulus = models.FileField('Stimulus', upload_to='single_choice/stimuli')

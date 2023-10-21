@@ -7,7 +7,8 @@ from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleCh
 
 @admin.register(SingleChoiceQuestion)
 class SingleChoiceQuestionAdmin(admin.ModelAdmin):
-    list_display = ('order', 'correct_sample', 'is_test_question', 'notes', 'created_at')
+    list_display = ('order', 'display_order', 'correct_sample', 'is_test_question', 'notes', 'created_at')
+    list_filter = ('is_test_question',)
 
 
 class SingleChoiceAnswerInline(admin.TabularInline):
