@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{{% block head %}
+    <script src="https://unpkg.com/jspsych@7.3.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-button-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-audio-keyboard-response@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.2"></script>
+    <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        function send_data() {
+            return;
+            const request_data = {answers: jsPsych.data.allData.trials}
+            fetch('{% url 'single-choice-result' %}',
+                {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(request_data)
+                })
+                .then(response => {
+                        console.log('Status Code:', response.status);
+                        if (!response.ok) {
+                            console.error(response)
+                            throw new Error(`Request failed with status ${response.status}`);
+                        }
+                    }
+                )
+                .catch(error => {
+                        console.error('Error:', error);
+                    }
+                );
+        }
+
+        const jsPsych = initJsPsych();
+        const timeline = [];
+
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus:
+                "Welcome to the experiment. " +
+                "In this experiment you will have to determine to which sample sound the stimulus is most similar to. " +
+                "Press any key to begin"
+        });
+
+
+        function add_question(data) {
+            timeline.push({
+                type: jsPsychHtmlButtonResponse,
+                stimulus: 'Here you can listen to samples. Press next when you are ready.',
+                choices: ['Next'],
+
+                on_start: function (trial) {
+                    trial.stimulus += `<br><audio controls id="${data.id}-1" src="${data.first_sample}"></audio>`;
+                    trial.stimulus += `<br><audio controls id="${data.id}-2" src="${data.second_sample}"></audio>`;
+                }
+            });
+            data.stimuli.forEach(stimulus => {
+                timeline.push(
+                    {
+                        type: jsPsychAudioKeyboardResponse,
+                        response_allowed_while_playing: false,
+                        stimulus: stimulus.url,
+                        prompt: 'Listen to the stimulus. Select to which sample it is most similar to (press F or J)',
+                        choices: ['f', 'j']
+                    }
+                )
+            })
+        }
+
+        let question_data;
+        {% for question in practice_questions %}
+            question_data = {
+                id: '{{ question.id }}',
+                first_sample: '{{ question.first_sample.url }}',
+                second_sample: '{{ question.second_sample.url }}',
+                stimuli: [
+                    {% for stimulus in question.stimuli_list %}
+                        {
+                            id: '{{ stimulus.id }}',
+                            url: '{{ stimulus.file.url }}'
+                        },
+                    {% endfor %}
+                ]
+            }
+            add_question(question_data)
+        {% endfor %}
+
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Press any key to begin the actual experiment"
+        });
+
+        {% for question in questions %}
+            question_data = {
+                id: '{{ question.id }}',
+                first_sample: '{{ question.first_sample.url }}',
+                second_sample: '{{ question.second_sample.url }}',
+                stimuli: [
+                    {% for stimulus in question.stimuli_list %}
+                        {
+                            id: '{{ stimulus.id }}',
+                            url: '{{ stimulus.file.url }}'
+                        },
+                    {% endfor %}
+                ]
+            }
+            add_question(question_data)
+        {% endfor %}
+
+
+        timeline.push(
+            {
+                type: jsPsychCallFunction,
+                func: send_data
+            }
+        )
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Thank you for participation! Your results have been recorded."
+        });
+
+        jsPsych.run(timeline);
+    </script>
+{% endblock %}

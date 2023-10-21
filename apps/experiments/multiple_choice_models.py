@@ -7,6 +7,7 @@ class MultipleChoiceQuestion(UUIDModel, DateTimeModel):
     order = models.PositiveIntegerField('Order')
     first_sample = models.FileField('First sample', upload_to='multiple_choice/first_samples')
     second_sample = models.FileField('Second sample', upload_to='multiple_choice/seconds_samples')
+    is_test_question = models.BooleanField('Is test question', default=False)
 
     class Meta:
         verbose_name = 'Multiple choice question'

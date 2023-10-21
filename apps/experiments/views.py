@@ -1,9 +1,11 @@
+from django.db.models import Prefetch
 from django.views import generic
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult
+from apps.experiments.multiple_choice_models import MultipleChoiceQuestion
 from apps.experiments.serializers import SingleChoiceResultSerializer
+from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult
 
 
 class SingleChoiceExperimentView(generic.TemplateView):
@@ -19,6 +21,17 @@ class SingleChoiceExperimentView(generic.TemplateView):
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         questions = base_qs.filter(is_test_question=False)
         context['questions'] = self.split_list(questions, 3)
+        return context
+
+
+class MultipleChoiceExperimentView(generic.TemplateView):
+    template_name = 'experiments/multiple_choice.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        base_qs = MultipleChoiceQuestion.objects.order_by('order').prefetch_related(Prefetch('stimuli', to_attr='stimuli_list'))
+        context['practice_questions'] = base_qs.filter(is_test_question=True)
+        context['questions'] = base_qs.filter(is_test_question=False)
         return context
 
 
