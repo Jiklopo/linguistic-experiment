@@ -34,8 +34,8 @@ class SingleChoiceResult(UUIDModel, DateTimeModel):
         return f'Result from {date_str}'
 
     class Meta:
-        verbose_name = 'result'
-        verbose_name_plural = 'results'
+        verbose_name = 'Single choice result'
+        verbose_name_plural = 'Single choice results'
         ordering = ('-created_at',)
 
 

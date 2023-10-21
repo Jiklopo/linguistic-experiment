@@ -254,3 +254,9 @@ AWS_S3_ENDPOINT_URL = os.getenv('AWS_S3_ENDPOINT_URL')
 AWS_STORAGE_BUCKET_NAME = 'sound_analysis'
 AWS_S3_REGION_NAME = 'sgp1'
 AWS_DEFAULT_ACL = 'public-read'
+
+# Other
+SHELL_PLUS_IMPORTS = [
+    'from apps.experiments.single_choice_models import *',
+    'from apps.experiments.multiple_choice_models import *',
+]

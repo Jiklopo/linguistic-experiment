@@ -9,7 +9,7 @@ single_choice_patterns = [
 
 multiple_choice_patterns = [
     path('', views.MultipleChoiceExperimentView.as_view(), name='multiple-choice-experiment'),
-    path('result/', views.SingleChoiceResultView.as_view(), name='multiple-choice-result'),
+    path('result/', views.MultipleChoiceResultView.as_view(), name='multiple-choice-result'),
 ]
 
 urlpatterns = [

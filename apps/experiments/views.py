@@ -3,8 +3,8 @@ from django.views import generic
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from apps.experiments.multiple_choice_models import MultipleChoiceQuestion
-from apps.experiments.serializers import SingleChoiceResultSerializer
+from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, MultipleChoiceResult
+from apps.experiments.serializers import SingleChoiceResultSerializer, MultipleChoiceResultSerializer
 from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult
 
 
@@ -29,7 +29,8 @@ class MultipleChoiceExperimentView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_qs = MultipleChoiceQuestion.objects.order_by('order').prefetch_related(Prefetch('stimuli', to_attr='stimuli_list'))
+        base_qs = MultipleChoiceQuestion.objects.order_by('order').prefetch_related(
+            Prefetch('stimuli', to_attr='stimuli_list'))
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         context['questions'] = base_qs.filter(is_test_question=False)
         return context
@@ -39,3 +40,9 @@ class SingleChoiceResultView(generics.CreateAPIView):
     permission_classes = [AllowAny]
     queryset = SingleChoiceResult.objects.all()
     serializer_class = SingleChoiceResultSerializer
+
+
+class MultipleChoiceResultView(generics.CreateAPIView):
+    permission_classes = [AllowAny]
+    queryset = MultipleChoiceResult.objects.all()
+    serializer_class = MultipleChoiceResultSerializer

@@ -15,9 +15,8 @@
 {% block scripts %}
     <script>
         function send_data() {
-            return;
             const request_data = {answers: jsPsych.data.allData.trials}
-            fetch('{% url 'single-choice-result' %}',
+            fetch('{% url 'multiple-choice-result' %}',
                 {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -37,7 +36,11 @@
                 );
         }
 
-        const jsPsych = initJsPsych();
+        const jsPsych = initJsPsych({
+            on_finish: function () {
+                jsPsych.data.displayData();
+            }
+        })
         const timeline = [];
 
         timeline.push({
@@ -50,27 +53,39 @@
 
 
         function add_question(data) {
-            timeline.push({
-                type: jsPsychHtmlButtonResponse,
-                stimulus: 'Here you can listen to samples. Press next when you are ready.',
-                choices: ['Next'],
+            const preload_audio = [data.first_sample, data.second_sample];
+            const trials = [
+                {
+                    type: jsPsychHtmlButtonResponse,
+                    stimulus: 'Here you can listen to samples. Press next when you are ready.',
+                    choices: ['Next'],
 
-                on_start: function (trial) {
-                    trial.stimulus += `<br><audio controls id="${data.id}-1" src="${data.first_sample}"></audio>`;
-                    trial.stimulus += `<br><audio controls id="${data.id}-2" src="${data.second_sample}"></audio>`;
-                }
-            });
-            data.stimuli.forEach(stimulus => {
-                timeline.push(
-                    {
-                        type: jsPsychAudioKeyboardResponse,
-                        response_allowed_while_playing: false,
-                        stimulus: stimulus.url,
-                        prompt: 'Listen to the stimulus. Select to which sample it is most similar to (press F or J)',
-                        choices: ['f', 'j']
+                    on_start: function (trial) {
+                        trial.stimulus += `<br><audio controls id="${data.id}-1" src="${data.first_sample}"></audio>`;
+                        trial.stimulus += `<br><audio controls id="${data.id}-2" src="${data.second_sample}"></audio>`;
                     }
-                )
+                }
+            ];
+
+            data.stimuli.forEach(stimulus => {
+                trials.push({
+                    type: jsPsychAudioKeyboardResponse,
+                    response_allowed_while_playing: false,
+                    stimulus: stimulus.url,
+                    prompt: 'Listen to the stimulus. Select to which sample it is most similar to (press F or J)',
+                    choices: ['f', 'j'],
+                    data: {
+                        stimulus_id: stimulus.id
+                    }
+                });
+                preload_audio.push(stimulus.url)
             })
+
+            timeline.push({
+                type: jsPsychPreload,
+                audio: preload_audio
+            })
+            timeline.push({timeline: trials})
         }
 
         let question_data;
