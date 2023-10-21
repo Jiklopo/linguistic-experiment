@@ -20,7 +20,7 @@ class SingleChoiceExperimentView(generic.TemplateView):
         base_qs = SingleChoiceQuestion.objects.order_by('order')
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         questions = base_qs.filter(is_test_question=False)
-        context['questions'] = self.split_list(questions, 3)
+        context['questions'] = self.split_list(questions, 20)
         return context
 
 

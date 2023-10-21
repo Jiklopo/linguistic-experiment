@@ -14,6 +14,13 @@
 
 {% block scripts %}
     <script>
+        function playAudio(audio_id) {
+            const audioElement = document.getElementById(audio_id);
+            if (audioElement) {
+                audioElement.play();
+            }
+        }
+
         function send_data() {
             const request_data = {answers: jsPsych.data.allData.trials}
             fetch('{% url 'multiple-choice-result' %}',
@@ -36,50 +43,35 @@
                 );
         }
 
-        const jsPsych = initJsPsych({
-            on_finish: function () {
-                jsPsych.data.displayData();
-            }
-        })
-        const timeline = [];
-
-        timeline.push({
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus:
-                "Welcome to the experiment. " +
-                "In this experiment you will have to determine to which sample sound the stimulus is most similar to. " +
-                "Press any key to begin"
-        });
-
-
         function add_question(data) {
             const preload_audio = [data.first_sample, data.second_sample];
             const trials = [
                 {
-                    type: jsPsychHtmlButtonResponse,
-                    stimulus: 'Here you can listen to samples. Press next when you are ready.',
-                    choices: ['Next'],
-
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: '',
                     on_start: function (trial) {
-                        trial.stimulus += `<br><audio controls id="${data.id}-1" src="${data.first_sample}"></audio>`;
-                        trial.stimulus += `<br><audio controls id="${data.id}-2" src="${data.second_sample}"></audio>`;
+                        trial.stimulus += `<audio id="${data.id}-1" src="${data.first_sample}"></audio>`;
+                        trial.stimulus += `<audio id="${data.id}-2" src="${data.second_sample}"></audio>`;
+                        trial.stimulus += `<button onclick="playAudio('${data.id}-1')">1</button>`;
+                        trial.stimulus += `<button onclick="playAudio('${data.id}-2')">2</button>`;
                     }
                 }
             ];
 
-            data.stimuli.forEach(stimulus => {
+            for (let i = 0; i < data.stimuli.length; i++) {
+                const stimulus = data.stimuli[i];
                 trials.push({
                     type: jsPsychAudioKeyboardResponse,
                     response_allowed_while_playing: false,
                     stimulus: stimulus.url,
-                    prompt: 'Listen to the stimulus. Select to which sample it is most similar to (press F or J)',
+                    prompt: `${i + 1}/${data.stimuli.length}`,
                     choices: ['f', 'j'],
                     data: {
                         stimulus_id: stimulus.id
                     }
                 });
-                preload_audio.push(stimulus.url)
-            })
+                preload_audio.push(stimulus.url);
+            }
 
             timeline.push({
                 type: jsPsychPreload,
@@ -87,6 +79,27 @@
             })
             timeline.push({timeline: trials})
         }
+
+        const jsPsych = initJsPsych()
+        const timeline = [];
+
+        timeline.push({
+            timeline: [
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Welcome'
+                },
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Instructions'
+                },
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Practice'
+                }
+            ]
+        });
+
 
         let question_data;
         {% for question in practice_questions %}
@@ -108,7 +121,7 @@
 
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Press any key to begin the actual experiment"
+            stimulus: "Actual"
         });
 
         {% for question in questions %}
@@ -137,7 +150,7 @@
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Thank you for participation! Your results have been recorded."
+            stimulus: "Thank you"
         });
 
         jsPsych.run(timeline);

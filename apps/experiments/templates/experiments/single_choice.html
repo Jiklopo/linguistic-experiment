@@ -37,34 +37,31 @@
 
         }
 
-        const jsPsych = initJsPsych();
-        const timeline = [];
-
-        timeline.push({
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus:
-                "Welcome to the experiment. " +
-                "In this experiment you will have to determine to which sample sound the stimulus is most similar to. " +
-                "Press any key to begin"
-        });
-
-        let question_block;
-        let preload_block;
-
-        {% for question in practice_questions %}
-            question_block = {
+        function add_question(question, question_number, total_questions) {
+            const counter = `${question_number}/${total_questions}`;
+            timeline.push({
+                type: jsPsychPreload,
+                audio: [
+                    question.first_sample,
+                    question.second_sample,
+                    question.stimulus
+                ]
+            })
+            timeline.push({
                 timeline: [
                     {
                         type: jsPsychAudioKeyboardResponse,
                         response_allowed_while_playing: false,
-                        stimulus: '{{ question.first_sample.url }}',
-                        choices: 'NO_KEYS',
-                        prompt: 'Listen to the first sample.',
+                        stimulus: question.first_sample,
+                        prompt: counter,
                         trial_ends_after_audio: true,
                     },
                     {
                         type: jsPsychCallFunction,
                         async: true,
+                        on_start: function (trial) {
+                            jsPsych.DOM_target.innerText = counter;
+                        },
                         func: function (done) {
                             jsPsych.pluginAPI.setTimeout(done, 750);
                         }
@@ -72,13 +69,15 @@
                     {
                         type: jsPsychAudioKeyboardResponse,
                         response_allowed_while_playing: false,
-                        stimulus: '{{ question.second_sample.url }}',
-                        prompt: 'Listen to the second sample.',
+                        stimulus: question.second_sample,
                         trial_ends_after_audio: true
                     },
                     {
                         type: jsPsychCallFunction,
                         async: true,
+                        on_start: function (trial) {
+                            jsPsych.DOM_target.innerText = counter;
+                        },
                         func: function (done) {
                             jsPsych.pluginAPI.setTimeout(done, 750);
                         }
@@ -86,111 +85,74 @@
                     {
                         type: jsPsychAudioKeyboardResponse,
                         response_allowed_while_playing: false,
-                        stimulus: '{{ question.stimulus.url }}',
-                        prompt: 'Listen to the stimulus.',
+                        stimulus: question.stimulus,
+                        prompt: counter,
                         trial_ends_after_audio: true
                     },
                     {
                         type: jsPsychHtmlKeyboardResponse,
                         choices: ['f', 'j'],
-                        stimulus: 'Choose which sample is most similar to the stimulus (press f or j)',
+                        stimulus: counter,
                         data: {
-                            question_id: '{{ question.id }}',
-                            correct_sample: '{{ question.correct_sample }}'
+                            question_id: question.id
                         },
                         on_finish: function (data) {
                             console.log(data);
                         }
                     }
                 ]
-            };
-            preload_block = {
-                type: jsPsychPreload,
-                audio: [
-                    '{{ question.first_sample.url }}',
-                    '{{ question.second_sample.url }}',
-                    '{{ question.stimulus.url }}'
-                ]
-            }
+            });
+        }
 
-            timeline.push(preload_block)
-            timeline.push(question_block)
+        const jsPsych = initJsPsych();
+        const timeline = [];
+        let question_data;
+
+        timeline.push({
+            timeline: [
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Welcome'
+                },
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Instructions'
+                },
+                {
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: 'Practice'
+                }
+            ]
+        });
+
+        {% for question in practice_questions %}
+            question_data = {
+                id: '{{ question.id }}',
+                first_sample: '{{ question.first_sample.url }}',
+                second_sample: '{{ question.second_sample.url }}',
+                stimulus: '{{ question.stimulus.url }}'
+            };
+            add_question(question_data, {{ forloop.counter }}, {{ practice_questions|length }});
         {% endfor %}
 
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Press any key to begin the actual experiment"
+            stimulus: "Actual"
         });
 
         {% for questions_list in questions %}
             {% for question in questions_list %}
-                question_block = {
-                    timeline: [
-                        {
-                            type: jsPsychAudioKeyboardResponse,
-                            response_allowed_while_playing: false,
-                            stimulus: '{{ question.first_sample.url }}',
-                            choices: 'NO_KEYS',
-                            prompt: 'Listen to the first sample.',
-                            trial_ends_after_audio: true,
-                        },
-                        {
-                            type: jsPsychCallFunction,
-                            async: true,
-                            func: function (done) {
-                                jsPsych.pluginAPI.setTimeout(done, 750);
-                            }
-                        },
-                        {
-                            type: jsPsychAudioKeyboardResponse,
-                            response_allowed_while_playing: false,
-                            stimulus: '{{ question.second_sample.url }}',
-                            prompt: 'Listen to the second sample.',
-                            trial_ends_after_audio: true
-                        },
-                        {
-                            type: jsPsychCallFunction,
-                            async: true,
-                            func: function (done) {
-                                jsPsych.pluginAPI.setTimeout(done, 750);
-                            }
-                        },
-                        {
-                            type: jsPsychAudioKeyboardResponse,
-                            response_allowed_while_playing: false,
-                            stimulus: '{{ question.stimulus.url }}',
-                            prompt: 'Listen to the stimulus.',
-                            trial_ends_after_audio: true
-                        },
-                        {
-                            type: jsPsychHtmlKeyboardResponse,
-                            choices: ['f', 'j'],
-                            stimulus: 'Choose which sample is most similar to the stimulus (press f or j)',
-                            data: {
-                                question_id: '{{ question.id }}',
-                                correct_sample: '{{ question.correct_sample }}'
-                            },
-                            on_finish: function (data) {
-                                console.log(data);
-                            }
-                        }
-                    ]
+                question_data = {
+                    id: '{{ question.id }}',
+                    first_sample: '{{ question.first_sample.url }}',
+                    second_sample: '{{ question.second_sample.url }}',
+                    stimulus: '{{ question.stimulus.url }}'
                 };
-                preload_block = {
-                    type: jsPsychPreload,
-                    audio: [
-                        '{{ question.first_sample.url }}',
-                        '{{ question.second_sample.url }}',
-                        '{{ question.stimulus.url }}'
-                    ]
-                }
-
-                timeline.push(preload_block)
-                timeline.push(question_block)
+                add_question(question_data, {{ forloop.counter }}, {{ questions_list|length }});
             {% endfor %}
             timeline.push({
                 type: jsPsychHtmlKeyboardResponse,
-                stimulus: "Press any key to continue"
+                stimulus: "Break time"
             });
         {% endfor %}
 
@@ -203,7 +165,7 @@
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: "Thank you for participation! Your results have been recorded."
+            stimulus: "Thank you"
         });
 
         jsPsych.run(timeline);
