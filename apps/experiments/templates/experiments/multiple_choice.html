@@ -68,6 +68,9 @@
                     choices: ['f', 'j'],
                     data: {
                         stimulus_id: stimulus.id
+                    },
+                    on_finish: function (data) {
+                        console.log(stimulus.id);
                     }
                 });
                 preload_audio.push(stimulus.url);
@@ -98,7 +101,7 @@
                 },
                 {
                     type: jsPsychHtmlKeyboardResponse,
-                    stimulus: '<p>First, click the buttons labeled “1” and “2” on the screen. You will hear two sounds. Please memorize these two sounds. You may listen to them multiple times if needed.<br>Next, 11 sounds will be played one at a time. For each sound, please decide whether it is more similar to the first sound or the second sound.<br>If it is more similar to the first sound, press “f” on your keyboard.<br>If it is more similar to the second sound”, press “j” on your keyboard.<br><br>まず、画面上の「1」と「2」と書かれたボタンをクリックしてください。2つの音声が再生されます。この２つの音声を覚えてください。必要に応じて、2回以上聴いても構いません。<br>次に、11個の音声がひとつずつ再生されます。各音声について、１つ目の音声により似ているか、それとも２つ目の音声により似ているかを判断してください。<br>１つ目の音声により似ている場合は、キーボードで「f」を押してください。<br>２つ目の音声により似ている場合は、、キーボードで「j」を押してください。<br><br>首先，請點擊螢幕上標示為「 1 」和 「2 」的按鈕。 您將聽到兩個聲音。 請記住這兩個聲音。 如有需要，您可以聽多次。<br>接下來，將會依次播放十一個聲音。針對每個聲音，請判斷它是否更接近第一個聲音還是第二個聲音。 <br>如果更接近第一個聲音，請在鍵盤上按下「f」鍵。 <br>如果更接近第二個聲音，請在鍵盤上按下「j」鍵。<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。</p>'
+                    stimulus: '<p>First, click the buttons labeled “1” and “2” on the screen. You will hear two sounds.<br>Please memorize these two sounds. You may listen to them multiple times if needed.<br>Next, 11 sounds will be played one at a time. For each sound, please decide whether it is more similar to the first sound or the second sound.<br>If it is more similar to the first sound, press “f” on your keyboard.<br>If it is more similar to the second sound”, press “j” on your keyboard.<br><br>まず、画面上の「1」と「2」と書かれたボタンをクリックしてください。2つの音声が再生されます。<br>この２つの音声を覚えてください。必要に応じて、2回以上聴いても構いません。<br>次に、11個の音声がひとつずつ再生されます。各音声について、１つ目の音声により似ているか、それとも２つ目の音声により似ているかを判断してください。<br>１つ目の音声により似ている場合は、キーボードで「f」を押してください。<br>２つ目の音声により似ている場合は、、キーボードで「j」を押してください。<br><br>首先，請點擊螢幕上標示為「 1 」和 「2 」的按鈕。 您將聽到兩個聲音。 請記住這兩個聲音。 如有需要，您可以聽多次。<br>接下來，將會依次播放十一個聲音。針對每個聲音，請判斷它是否更接近第一個聲音還是第二個聲音。 <br>如果更接近第一個聲音，請在鍵盤上按下「f」鍵。 <br>如果更接近第二個聲音，請在鍵盤上按下「j」鍵。<br><br>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。</p>'
                 }
             ]
         });
@@ -144,7 +147,7 @@
             }
 
             {% if forloop.last %}
-            	is_last = true;
+                is_last = true;
             {% else %}
                 is_last = false;
             {% endif %}

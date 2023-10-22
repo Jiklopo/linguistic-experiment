@@ -3,7 +3,7 @@ from django.views import generic
 from rest_framework import generics
 from rest_framework.permissions import AllowAny
 
-from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, MultipleChoiceResult
+from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, MultipleChoiceResult, Stimulus
 from apps.experiments.serializers import SingleChoiceResultSerializer, MultipleChoiceResultSerializer
 from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult
 
@@ -17,7 +17,7 @@ class SingleChoiceExperimentView(generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_qs = SingleChoiceQuestion.objects.order_by('display_order')
+        base_qs = SingleChoiceQuestion.objects.order_by('?')
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         questions = base_qs.filter(is_test_question=False)
         context['questions'] = self.split_list(questions, 20)
@@ -30,7 +30,10 @@ class MultipleChoiceExperimentView(generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         base_qs = MultipleChoiceQuestion.objects.order_by('order').prefetch_related(
-            Prefetch('stimuli', to_attr='stimuli_list'))
+            Prefetch('stimuli',
+                     queryset=Stimulus.objects.order_by('?'),
+                     to_attr='stimuli_list')
+        )
         context['practice_questions'] = base_qs.filter(is_test_question=True)
         context['questions'] = base_qs.filter(is_test_question=False)
         return context
