@@ -54,6 +54,7 @@
                         trial.stimulus += `<audio id="${data.id}-2" src="${data.second_sample}"></audio>`;
                         trial.stimulus += `<button onclick="playAudio('${data.id}-1')">1</button>`;
                         trial.stimulus += `<button onclick="playAudio('${data.id}-2')">2</button>`;
+                        console.log(`Question #${data.order}`);
                     }
                 }
             ];
@@ -70,7 +71,7 @@
                         stimulus_id: stimulus.id
                     },
                     on_finish: function (data) {
-                        console.log(stimulus.id);
+                        console.log(`${stimulus.order} - ${data.response}`);
                     }
                 });
                 preload_audio.push(stimulus.url);
@@ -111,12 +112,14 @@
         {% for question in practice_questions %}
             question_data = {
                 id: '{{ question.id }}',
+                order: '{{ question.order }}',
                 first_sample: '{{ question.first_sample.url }}',
                 second_sample: '{{ question.second_sample.url }}',
                 stimuli: [
                     {% for stimulus in question.stimuli_list %}
                         {
                             id: '{{ stimulus.id }}',
+                            order: '{{ stimulus.order }}',
                             url: '{{ stimulus.file.url }}'
                         },
                     {% endfor %}
@@ -134,12 +137,14 @@
         {% for question in questions %}
             question_data = {
                 id: '{{ question.id }}',
+                order: '{{ question.order }}',
                 first_sample: '{{ question.first_sample.url }}',
                 second_sample: '{{ question.second_sample.url }}',
                 stimuli: [
                     {% for stimulus in question.stimuli_list %}
                         {
                             id: '{{ stimulus.id }}',
+                            order: '{{ stimulus.order }}',
                             url: '{{ stimulus.file.url }}'
                         },
                     {% endfor %}

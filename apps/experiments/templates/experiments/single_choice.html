@@ -97,7 +97,7 @@
                             question_id: question.id
                         },
                         on_finish: function (data) {
-                            console.log(question.id);
+                            console.log(`${question.order} - ${data.response}`);
                         }
                     }
                 ]
@@ -128,6 +128,7 @@
         {% for question in practice_questions %}
             question_data = {
                 id: '{{ question.id }}',
+                order: '{{ question.order }}',
                 first_sample: '{{ question.first_sample.url }}',
                 second_sample: '{{ question.second_sample.url }}',
                 stimulus: '{{ question.stimulus.url }}'
@@ -144,6 +145,7 @@
             {% for question in questions_list %}
                 question_data = {
                     id: '{{ question.id }}',
+                    order: '{{ question.order }}',
                     first_sample: '{{ question.first_sample.url }}',
                     second_sample: '{{ question.second_sample.url }}',
                     stimulus: '{{ question.stimulus.url }}'
