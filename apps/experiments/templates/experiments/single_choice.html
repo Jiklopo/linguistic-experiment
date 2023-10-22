@@ -152,10 +152,12 @@
                 };
                 add_question(question_data, {{ forloop.counter }}, {{ questions_list|length }});
             {% endfor %}
-            timeline.push({
-                type: jsPsychHtmlKeyboardResponse,
-                stimulus: '<p>Let’s take a break for a moment. Please press any key on your keyboard when you are ready to continue.<br>少し休憩しましょう。再開の準備ができたらキーボードで任意のキーを押してください。<br>現在休息一下。當您準備好繼續時，請按下鍵盤上的任意鍵。</p>'
-            });
+            {% if not forloop.last %}
+                timeline.push({
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: '<p>Let’s take a break for a moment. Please press any key on your keyboard when you are ready to continue.<br>少し休憩しましょう。再開の準備ができたらキーボードで任意のキーを押してください。<br>現在休息一下。當您準備好繼續時，請按下鍵盤上的任意鍵。</p>'
+                });
+            {% endif %}
         {% endfor %}
 
 
@@ -167,7 +169,7 @@
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: '<p>This is the end of the first task. Please let me know so that I can send you the link to the second task. <br>課題１は以上です。お疲れ様でした。課題２へのURLをお送りいたしますので、お声掛けください。<br>任務一到此結束。請通知我，以便我把任務二的鏈接發給您。</p>'
+            stimulus: '<p>This is the end of the first task. Please let me know so that I can send you the link to the second task. <br>課題１は以上です。お疲れ様でした。課題２へのURLをお送りいたしますので、お声掛けください。<br>任務一到此結束。請通知我，以便我把任務二的鏈接發給您。<br>Please press any key on your keyboard to save the results before closing the tab.<br>結果を保存するために、ウィンドウを閉じる前にキーボードの任意のキーを押してください。<br>請在關閉視窗之前按下鍵盤上的任意鍵儲存實驗數據。</p>'
         });
 
         jsPsych.run(timeline);

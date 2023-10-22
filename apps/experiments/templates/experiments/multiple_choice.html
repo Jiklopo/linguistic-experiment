@@ -54,6 +54,7 @@
                         trial.stimulus += `<audio id="${data.id}-2" src="${data.second_sample}"></audio>`;
                         trial.stimulus += `<button onclick="playAudio('${data.id}-1')">1</button>`;
                         trial.stimulus += `<button onclick="playAudio('${data.id}-2')">2</button>`;
+                        trial.stimulus += '<p>Press any key on your keyboard to go to the next page.<br>次のページに進むにはキーボードで任意のキーを押してください。<br>按下任意鍵以前往下一頁。</p>';
                         console.log(`Question #${data.order}`);
                     }
                 }
@@ -168,7 +169,7 @@
         )
         timeline.push({
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: '<p>That’s all. Thank you for your participation!<br>以上です。お疲れ様でした。この度は、ご参加いただきありがとうございました！<br>本次實驗到此結束。謝謝您的參與！</p>'
+            stimulus: '<p>That’s all. Thank you for your participation!<br>以上です。お疲れ様でした。この度は、ご参加いただきありがとうございました！<br>本次實驗到此結束。謝謝您的參與！<br>Please press any key on your keyboard to save the results before closing the tab.<br>結果を保存するために、ウィンドウを閉じる前にキーボードの任意のキーを押してください。<br>請在關閉視窗之前按下鍵盤上的任意鍵儲存實驗數據。</p>'
         });
 
         jsPsych.run(timeline);
