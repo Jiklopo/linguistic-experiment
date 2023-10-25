@@ -63,3 +63,13 @@ class SingleChoiceAnswer(UUIDModel):
         verbose_name = 'Answer'
         verbose_name_plural = 'Answers'
         ordering = ('-result__created_at', 'question__order')
+
+
+class SingleChoiceExport(UUIDModel, DateTimeModel):
+    notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
+    export_file = models.FileField('Export file', upload_to='results/single_choice', )
+
+    class Meta:
+        verbose_name = 'Single choice export'
+        verbose_name_plural = 'Single choice exports'
+        ordering = ('-created_at',)

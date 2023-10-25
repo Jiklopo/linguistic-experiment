@@ -1,8 +1,12 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, Stimulus, MultipleChoiceResult, \
     MultipleChoiceAnswer
-from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult, SingleChoiceAnswer
+from apps.experiments.services import export_single_choice_results
+from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult, SingleChoiceAnswer, \
+    SingleChoiceExport
 
 
 @admin.register(SingleChoiceQuestion)
@@ -27,6 +31,21 @@ class SingleChoiceResultAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'notes']
     readonly_fields = ['created_at']
     inlines = [SingleChoiceAnswerInline]
+
+    @admin.action(description='Create export')
+    def export(self, request, qs):
+        export = export_single_choice_results(qs)
+        redirect_url = reverse('admin:experiments_singlechoiceexport_change', args=[export.id])
+        return HttpResponseRedirect(redirect_url)
+
+    actions = [export]
+
+
+@admin.register(SingleChoiceExport)
+class SingleChoiceExportAdmin(admin.ModelAdmin):
+    list_display = ['created_at', 'notes', 'export_file']
+    readonly_fields = ['export_file']
+
 
 
 class StimulusInline(admin.StackedInline):
