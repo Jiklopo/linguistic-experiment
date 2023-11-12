@@ -2,9 +2,10 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+from apps.experiments.exports.multiple_choice import export_multiple_choice_results
+from apps.experiments.exports.single_choice import export_single_choice_results
 from apps.experiments.multiple_choice_models import MultipleChoiceQuestion, Stimulus, MultipleChoiceResult, \
-    MultipleChoiceAnswer
-from apps.experiments.services import export_single_choice_results
+    MultipleChoiceAnswer, MultipleChoiceExport
 from apps.experiments.single_choice_models import SingleChoiceQuestion, SingleChoiceResult, SingleChoiceAnswer, \
     SingleChoiceExport
 
@@ -42,10 +43,10 @@ class SingleChoiceResultAdmin(admin.ModelAdmin):
 
 
 @admin.register(SingleChoiceExport)
-class SingleChoiceExportAdmin(admin.ModelAdmin):
+@admin.register(MultipleChoiceExport)
+class ExportAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'notes', 'export_file']
     readonly_fields = ['export_file']
-
 
 
 class StimulusInline(admin.StackedInline):
@@ -79,3 +80,11 @@ class MultipleChoiceAnswerInline(admin.TabularInline):
 class MultipleChoiceResultAdmin(admin.ModelAdmin):
     inlines = [MultipleChoiceAnswerInline]
     list_display = ['created_at', 'notes']
+
+    @admin.action(description='Create export')
+    def export(self, request, qs):
+        export = export_multiple_choice_results(qs)
+        redirect_url = reverse('admin:experiments_multiplechoiceexport_change', args=[export.id])
+        return HttpResponseRedirect(redirect_url)
+
+    actions = [export]

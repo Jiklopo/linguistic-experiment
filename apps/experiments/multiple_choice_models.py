@@ -78,3 +78,13 @@ class MultipleChoiceAnswer(UUIDModel):
         verbose_name = 'Multiple choice answer'
         verbose_name_plural = 'Multiple choice answers'
         ordering = ('stimulus__question__order', 'stimulus__order')
+
+
+class MultipleChoiceExport(UUIDModel, DateTimeModel):
+    notes = models.TextField('Notes', blank=True, null=True, help_text='Just notes for yourself')
+    export_file = models.FileField('Export file', upload_to='results/multiple_choice', )
+
+    class Meta:
+        verbose_name = 'Multiple choice export'
+        verbose_name_plural = 'Multiple choice exports'
+        ordering = ('-created_at',)
