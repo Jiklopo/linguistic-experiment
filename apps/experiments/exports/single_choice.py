@@ -1,7 +1,7 @@
 import csv
 from io import StringIO
 
-from django.db.models import Count, Q, FilteredRelation, F, Avg
+from django.db.models import Count, Q, FilteredRelation, F, Avg, StdDev
 
 from apps.experiments.exports.utils import extract_file_name, group_results_by_group_name, create_export
 from apps.experiments.single_choice_models import SingleChoiceExport, SingleChoiceQuestion
@@ -25,7 +25,8 @@ def export_single_choice_results(results_qs):
             f'total_answers_{group_name}': Count(answers_field),
             f'correct_answers_{group_name}': Count(answers_field, filter=Q(**{f'{answers_field}__is_correct': True})),
             f'correct_percentage_{group_name}': 1.0 * F(f'correct_answers_{group_name}') / F(f'total_answers_{group_name}'),
-            f'average_response_time_{group_name}': Avg(f'answers_{group_name}__response_time_ms')
+            f'average_response_time_{group_name}': Avg(f'answers_{group_name}__response_time_ms'),
+            f'std_dev_time_{group_name}': StdDev(f'answers_{group_name}__response_time_ms'),
         })
 
     with StringIO() as string_buffer:
@@ -38,11 +39,11 @@ def export_single_choice_results(results_qs):
 
 
 def annotate_results(csv_writer):
-    group_names = ('', '', '', '', 'A', '', 'B', '', 'C', '')
+    group_names = ('', '', '', '', 'A', '', '', 'B', '', '', 'C', '', '')
     column_names = ('Question number', 'Sample 1', 'Sample 2', 'Stimulus',
-                    '% correct response', 'Average response time ms',
-                    '% correct response', 'Average response time ms',
-                    '% correct response', 'Average response time ms')
+                    '% correct response', 'Average response time ms', 'SD of response time',
+                    '% correct response', 'Average response time ms', 'SD of response time',
+                    '% correct response', 'Average response time ms', 'SD of response time')
     csv_writer.writerow(group_names)
     csv_writer.writerow(column_names)
 
@@ -57,5 +58,6 @@ def add_results_to_csv(csv_writer, question):
     for group_name in GROUP_NAMES:
         row.append(round(getattr(question, f'correct_percentage_{group_name}'), 3))
         row.append(round(getattr(question, f'average_response_time_{group_name}')))
+        row.append(round(getattr(question, f'std_dev_time_{group_name}'), 3))
 
     csv_writer.writerow(row)

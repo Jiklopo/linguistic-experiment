@@ -2,7 +2,7 @@ import csv
 from io import StringIO
 from itertools import groupby
 
-from django.db.models import Count, Q, FilteredRelation, F, Avg
+from django.db.models import Count, Q, FilteredRelation, F, Avg, StdDev
 
 from apps.experiments.choices import CorrectSampleChoices
 from apps.experiments.exports import GROUP_NAMES
@@ -23,7 +23,8 @@ def export_multiple_choice_results(results_qs):
             f'first_answers_{group_name}': Count(answers_field, filter=Q(
                 **{f'{answers_field}__selected_sample': CorrectSampleChoices.FIRST})),
             f'first_percentage_{group_name}': 1.0 * F(f'first_answers_{group_name}') / F(f'total_answers_{group_name}'),
-            f'average_response_time_{group_name}': Avg(f'answers_{group_name}__response_time_ms')
+            f'average_response_time_{group_name}': Avg(f'answers_{group_name}__response_time_ms'),
+            f'std_dev_time_{group_name}': StdDev(f'answers_{group_name}__response_time_ms'),
         })
 
     grouped_stimuli = groupby(stimuli, key=lambda x: x.question.order)
@@ -40,12 +41,12 @@ def export_multiple_choice_results(results_qs):
 
 
 def annotate_results(csv_writer, question_number):
-    question_row = ('', '', '', f'Q{question_number}', '', '', '')
-    group_names = ('', 'A', '', 'B', '', 'C', '')
+    question_row = ('', '', '', '', f'Q{question_number}', '', '', '', '', '')
+    group_names = ('', 'A', '', '', 'B', '', '', 'C', '', '')
     column_names = ('Stimulus',
-                    '% "First" response', 'Average response time ms',
-                    '% "First" response', 'Average response time ms',
-                    '% "First" response', 'Average response time ms')
+                    '% "First" response', 'Average response time ms', 'SD of response time',
+                    '% "First" response', 'Average response time ms', 'SD of response time',
+                    '% "First" response', 'Average response time ms', 'SD of response time')
     csv_writer.writerow(question_row)
     csv_writer.writerow(group_names)
     csv_writer.writerow(column_names)
@@ -56,5 +57,6 @@ def add_results_to_csv(csv_writer, stimulus):
     for group_name in GROUP_NAMES:
         row.append(round(getattr(stimulus, f'first_percentage_{group_name}'), 3))
         row.append(round(getattr(stimulus, f'average_response_time_{group_name}')))
+        row.append(round(getattr(stimulus, f'std_dev_time_{group_name}'), 3))
 
     csv_writer.writerow(row)
